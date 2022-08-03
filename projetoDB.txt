@@ -1,0 +1,6 @@
+Anotações projeto de pesquisa - Bancos de dado chave-valor
+
+30/06 -> 
+    Testei Redis com sucesso utilizando o docker. Armazenei a chave e consegui retornar o valor correspondente.
+    Para utilizar o redis-cli no docker, executar o comando 'sudo docker exec -it nome-do-container sh'
+    
