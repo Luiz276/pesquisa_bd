@@ -4,3 +4,6 @@ Anotações projeto de pesquisa - Bancos de dado chave-valor
     Testei Redis com sucesso utilizando o docker. Armazenei a chave e consegui retornar o valor correspondente.
     Para utilizar o redis-cli no docker, executar o comando 'sudo docker exec -it nome-do-container sh'
     
+30/08 ->
+    Instalando biblioteca hiredis, necessário rodar o comando "sudo ldconfig" para que a biblioteca funcione.
+    
