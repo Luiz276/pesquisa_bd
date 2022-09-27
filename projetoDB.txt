@@ -8,4 +8,10 @@ Anotações projeto de pesquisa - Bancos de dado chave-valor
     Instalando biblioteca hiredis, necessário rodar o comando "sudo ldconfig" para que a biblioteca funcione.
     Usando hiredis para interagir com bancos redis.
     Adicionado um método de medição do tempo decorrido de cada requisição ao banco de dados usando time_t.
-    
+
+26/10 ->
+    Redis possui comando built-in para obter latência e gráfico de latência
+    Redis possui comando built-in para obter uso de memória
+    "latency" - retorna a latência
+    "instantaneous_ops_per_sec" - retorna o throughput
+    "hit rate (calculated)" - retorna o hit-rate

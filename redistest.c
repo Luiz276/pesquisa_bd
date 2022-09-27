@@ -61,9 +61,7 @@ for (int i=0; i<n_reqs; i++) {
    //gettimeofday(&t1, NULL);
     if (rand() % 100 > get_chance) {
         usleep(rand()%200);
-        //strcpy(key, (char)rand()%1000);
         snprintf(key, 5, "%d", rand()%1000);
-        //strcpy(value, (char)rand()%1000);
         snprintf(value, 5, "%d", rand()%1000);
         gettimeofday(&t1, NULL);
         #pragma omp critical
