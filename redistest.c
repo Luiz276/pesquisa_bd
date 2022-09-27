@@ -22,6 +22,7 @@ redisContext *c;
 int n_reqs = 100;
 int get_chance = 50;
 struct timeval t1, t2;
+char key[4], value[4];
 
 srand(time(NULL));
 
@@ -53,9 +54,13 @@ for (int i=0; i<n_reqs; i++) {
    //gettimeofday(&t1, NULL);
     if (rand() % 100 > get_chance) {
         usleep(rand()%200);
+        //strcpy(key, (char)rand()%1000);
+        snprintf(key, 4, "%d", rand()%1000);
+        //strcpy(value, (char)rand()%1000);
+        snprintf(value, 4, "%d", rand()%1000);
         gettimeofday(&t1, NULL);
         #pragma omp critical
-        reply[omp_get_thread_num()] = redisCommand(c,"SET %s %s","foo","bar");
+        reply[omp_get_thread_num()] = redisCommand(c,"SET %s %s",key, value);
         freeReplyObject(reply[omp_get_thread_num()]);
         gettimeofday(&t2, NULL);
         //printf("%d GET\n", i);
