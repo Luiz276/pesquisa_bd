@@ -9,10 +9,12 @@
 /*
 TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reunião
         -Adicionar possibilidade de utilização de parâmetros argc e argv
-        -Adicionar possibilidade de dar set e get em chaves aleatórias
+        #-Adicionar possibilidade de dar set em chaves aleatórias
+        -Get em chaves aleatórias
         #-Mudar calculo da chance entre get e set
         #-Paralelizar o programa
         -Medir vazão com uma thread específica e salvar em um txt ou csv
+        #-Latência de cada requisição salva em um txt
         -Refatorar if e else dentro do for para usar uma string e redisCommand ser genérico
 */
 
@@ -22,8 +24,10 @@ redisContext *c;
 int n_reqs = 100;
 int get_chance = 50;
 struct timeval t1, t2;
-char key[5], value[5], array_chaves[256][5];
+double tf;
+char key[5], value[5];
 int n_chaves = 256;
+FILE *fptr;
 
 srand(time(NULL));
 
@@ -39,22 +43,35 @@ printf("RESPONSE: %s\n", reply[0]->str);
 freeReplyObject(reply[0]);
 
 // Comandos de SET e GET
-
+//reply[0] = redisCommand(c,"SET %s %s","bar","bar");
+//freeReplyObject(reply[0]);
+reply[0] = redisCommand(c,"GET %s","ufsc");
+if(reply[0]->elements > 0) {
+    printf("%s\n",reply[0]->str);
+}
+freeReplyObject(reply[0]);
 reply[0] = redisCommand(c,"SET %s %s","foo","bar");
 freeReplyObject(reply[0]);
 
+/*
 #pragma omp parallel for private(t1,t2,reply)
 for (int i=0; i<10; i++) {
     printf("%d\n", i);
 }
+*/
 
 omp_set_num_threads(4);
 
+/*
+// Cria uma lista dechaves pré existentes
 #pragma omp parallel for private(key)
 for (int i=0; i< n_chaves; i++) {
     snprintf(key, 4, "%d", rand()%1000);
     strcpy(array_chaves[i][0], key);
 }
+*/
+
+fptr = fopen("./redistest.txt", "w");
 
 #pragma omp parallel for firstprivate(t1,t2,reply)
 for (int i=0; i<n_reqs; i++) {
@@ -69,20 +86,27 @@ for (int i=0; i<n_reqs; i++) {
         freeReplyObject(reply[omp_get_thread_num()]);
         gettimeofday(&t2, NULL);
         //printf("%d GET\n", i);
-        printf("Tempo tomado para operação SET: %f\n", (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0));
+        tf = (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0);
+        fprintf(fptr, "SET: %f\n", tf);
+        printf("Tempo tomado para operação SET: %f\n", tf);
     } else {
         usleep(rand()%200);
         gettimeofday(&t1, NULL);
         #pragma omp critical
-        reply[omp_get_thread_num()] = redisCommand(c,"GET %s %s",array_chaves[rand()%256]);
+        reply[omp_get_thread_num()] = redisCommand(c,"GET %s","foo");
         //printf("%s\n",reply->str);
         freeReplyObject(reply[omp_get_thread_num()]);
-        //printf("%d SET\n", i);
         gettimeofday(&t2, NULL);
-        printf("Tempo tomado para operação GET: %f\n", (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0));
+        tf = (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0);
+        fprintf(fptr, "GET: %f\n", tf);
+        printf("Tempo tomado para operação GET: %f\n", tf);
     }
 }
 
+reply[0] = redisCommand(c,"latency");
+printf("%s\n",reply[0]->str);
+
+fclose(fptr);
 
 redisFree(c);
 }
