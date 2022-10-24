@@ -19,3 +19,10 @@ Anotações projeto de pesquisa - Bancos de dado chave-valor
 03/10 ->
     Dificuldades para criar uma thread específica para o cálculo da latência e manter as outras threads
      executando o loop em paralelo com openmp
+
+23/10 ->
+    Adicionando cláusula nowait ao loop for soluciona o problema de uma thread não encerrar
+    Programa roda corretamente, teste com 10 milhões de requisições em 5 threads resultou em um throughput
+     médio de 18000 a 19500 requisições por segundo
+    Faltam apenas algumas refatorações no código com o intuito de melhorar legibilidade e facilitar manutenção/extensão,
+     mas o rpograma funciona perfeitamente

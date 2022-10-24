@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
     2° - número de chaves a serem usadas (ainda não implementado)
     3° - chance de ocorrer uma requisição GET
     4° - chance de ocorrer o registro da latência da requisição em um .txt
-    5° - número de reuisições a serem realizadas
+    5° - número de requisições a serem realizadas
     Exemplo: ./redistest 4 256 50 30 100
     */
     if (argc == 1) {
@@ -107,18 +107,19 @@ int main (int argc, char *argv[]) {
             // código da thread de vazão
 
             do {
-                sleep(1);    // sleep de 1 segundo
-                if (rand()%100 < write_file_chance) {
+                //sleep(1);    // sleep de 1 segundo
+                //if (rand()%100 < write_file_chance) {
+                if (1) {    // o bloco de código sempre será executado, somente para testes
                     #pragma omp critical
                     fprintf(fptr_tp, "%d\n", (reqs_env - reqs_env_antigas));
                     //printf("Tempo tomado para operação SET: %f\n", tf);
                 }
                 reqs_env_antigas = reqs_env;
-                //sleep(1);    // sleep de 1 segundo
+                sleep(1);    // sleep de 1 segundo
             } while (reqs_env < n_reqs);
         }
         else {
-            #pragma omp for firstprivate(t1,t2,reply)
+            #pragma omp for firstprivate(t1,t2,reply) schedule(dynamic) nowait
             for (int i=0; i<n_reqs; i++) {
                 //gettimeofday(&t1, NULL);
                 if (rand() % 100 > get_chance) {
@@ -162,6 +163,7 @@ int main (int argc, char *argv[]) {
                 }
             }
         }
+        printf("Thread %d finalizada\n", omp_get_thread_num());
     }
 
     fclose(fptr_tp);
