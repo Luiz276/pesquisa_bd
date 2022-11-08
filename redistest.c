@@ -14,7 +14,7 @@ TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reu
         #-Get em chaves aleatórias
         #-Mudar calculo da chance entre get e set
         #-Paralelizar o programa
-        -Medir vazão com uma thread específica
+        #-Medir vazão com uma thread específica
         #-salvar medições em um txt ou csv
         #-Latência de cada requisição salva em um txt
         -Refatorar if e else dentro do for para usar uma string e redisCommand ser genérico
@@ -87,8 +87,8 @@ int main (int argc, char *argv[]) {
     }
     */
 
-    fptr_lat = fopen("./redis_lat.txt", "w");
-    fptr_tp = fopen("./redis_tp.txt", "w");
+    fptr_lat = fopen("./redis_lat.csv", "w");
+    fptr_tp = fopen("./redis_tp.csv", "w");
 
     /*
     #pragma omp parallel num_threads(2)
@@ -126,9 +126,9 @@ int main (int argc, char *argv[]) {
                     usleep(rand()%200);
                     snprintf(key, 5, "%d", rand()%n_chaves);
                     snprintf(value, 5, "%d", rand()%1000);
-                    gettimeofday(&t1, NULL);
                     #pragma omp critical
                     {
+                        gettimeofday(&t1, NULL);
                         reply[omp_get_thread_num()] = redisCommand(c,"SET %s %s",key, value);
                         freeReplyObject(reply[omp_get_thread_num()]);
                         reqs_env++;
@@ -142,9 +142,9 @@ int main (int argc, char *argv[]) {
                 } else {
                     usleep(rand()%200);
                     snprintf(key, 5, "%d", rand()%n_chaves);
-                    gettimeofday(&t1, NULL);
                     #pragma omp critical
                     {
+                        gettimeofday(&t1, NULL);
                         reply[omp_get_thread_num()] = redisCommand(c,"GET %s",key);
                         freeReplyObject(reply[omp_get_thread_num()]);
                         reqs_env++;

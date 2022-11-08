@@ -25,4 +25,14 @@ Anotações projeto de pesquisa - Bancos de dado chave-valor
     Programa roda corretamente, teste com 10 milhões de requisições em 5 threads resultou em um throughput
      médio de 18000 a 19500 requisições por segundo
     Faltam apenas algumas refatorações no código com o intuito de melhorar legibilidade e facilitar manutenção/extensão,
-     mas o rpograma funciona perfeitamente
+     mas o programa funciona perfeitamente
+
+31/10 ->
+    Redis é implementado como um programa single-threaded e single-proccess, utilizando apenas um core da CPU
+    Não possui compatibilidade com paralelismo, somente com concorrência
+    Possui pipelining, que permite que comandos sejam enviados mesmo sem que o comando atual termine
+     sua execução
+    Redis foi projetado para rodar múltiplos processos(instâncias), de modo a maximizar a eficiência
+     no uso de multicores. Ou seja, uma máquina roda múltipĺas instâncias da DB
+    Redis foi projetado para escalar horizontalmente, onde cada vez mais nodos(ou processos) são adicionados
+     para maximizar eficiência
