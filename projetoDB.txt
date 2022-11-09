@@ -40,3 +40,7 @@ Anotações projeto de pesquisa - Bancos de dado chave-valor
 08/11 ->
     Implementar uma conexão para cada thread, ao invés de uma conexão para o processo completo. Isto pode
      ajudar a aumentar o paralelismo entre as threads, já que cada uma terá uma conexão exclusiva.
+
+09/11 ->
+    Comando para deletar todas as chevs existentes no banco: FLUSHALL
+    Arquivos csv funcionando de forma correta

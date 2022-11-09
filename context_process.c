@@ -6,6 +6,10 @@
 #include <sys/time.h>
 #include <omp.h>
 #include <unistd.h>
+
+// antigo redistest
+// threads compartilham context
+
 /*
 TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reunião
         #-Adicionar possibilidade de utilização de parâmetros argc e argv
