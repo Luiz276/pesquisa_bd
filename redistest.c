@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <omp.h>
 #include <unistd.h>
-//#include "redistest.h"
 /*
 TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reunião
         #-Adicionar possibilidade de utilização de parâmetros argc e argv
@@ -41,8 +40,8 @@ int main (int argc, char *argv[]) {
     redisContext *c;
     int n_chaves = strtol(argv[2], &ptr, 10);
     int get_chance = strtol(argv[3], &ptr, 10), write_file_chance = strtol(argv[4], &ptr, 10);
-    struct timeval t1, t2;
-    double tf;
+    struct timeval t1, t2, ts, ti;    // ts e ti sao usados para timestamp e tempo inicial
+    //double tf;
     char key[5], value[5];
     FILE *fptr_lat, *fptr_tp;   // um arquivo para armazenar latência e outro para armazenar throughput
     int n_reqs = strtol(argv[5], &ptr, 10);
@@ -61,20 +60,6 @@ int main (int argc, char *argv[]) {
     printf("RESPONSE: %s\n", reply[0]->str);
     freeReplyObject(reply[0]);
 
-    // Comandos de SET e GET
-    //reply[0] = redisCommand(c,"SET %s %s","bar","bar");
-    //freeReplyObject(reply[0]);
-    /*
-    reply[0] = redisCommand(c,"GET %s","ufsc");
-    if(reply[0]->elements > 0) {
-        printf("%s\n",reply[0]->str);
-    }
-    freeReplyObject(reply[0]);
-    reply[0] = redisCommand(c,"SET %s %s","foo","bar");
-    freeReplyObject(reply[0]);
-    */
-
-
     omp_set_num_threads(n_threads);
     printf("n threads = %d\n", omp_get_max_threads());
 
@@ -87,31 +72,24 @@ int main (int argc, char *argv[]) {
     }
     */
 
-    fptr_lat = fopen("./redis_lat.csv", "w");
-    fptr_tp = fopen("./redis_tp.csv", "w");
+    fptr_lat = fopen("./redis_lat.csv", "w");   // formato: timestamp,latencia,op,info
+    fptr_tp = fopen("./redis_tp.csv", "w");     // formato: timestamp,throughput
 
-    /*
-    #pragma omp parallel num_threads(2)
+    #pragma omp parallel private(ti,ts)
     {
-        #pragma single()
-        thread_vazao(n_reqs);
+        double tf, tfs;
+        gettimeofday(&ti, NULL);    // tempo inicial
 
-        #pragma single
-        loop_multithread(n_threads);
-    }
-    */
-
-    #pragma omp parallel
-    {
         if (omp_get_thread_num() == 0) {
             // código da thread de vazão
-
             do {
                 //sleep(1);    // sleep de 1 segundo
                 //if (rand()%100 < write_file_chance) {
                 if (1) {    // o bloco de código sempre será executado, somente para testes
                     #pragma omp critical
-                    fprintf(fptr_tp, "%d\n", (reqs_env - reqs_env_antigas));
+                    gettimeofday(&ts, NULL);
+                    tfs = (ts.tv_sec -ti.tv_sec) + ((ts.tv_usec -ti.tv_usec)/1000000.0);
+                    fprintf(fptr_tp, "%f,%d\n", tfs, (reqs_env - reqs_env_antigas));
                     //printf("Tempo tomado para operação SET: %f\n", tf);
                 }
                 reqs_env_antigas = reqs_env;
@@ -133,11 +111,13 @@ int main (int argc, char *argv[]) {
                         freeReplyObject(reply[omp_get_thread_num()]);
                         reqs_env++;
                         gettimeofday(&t2, NULL);
+                        gettimeofday(&ts, NULL);
                     }
                     tf = (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0);
+                    tfs = (ts.tv_sec -ti.tv_sec) + ((ts.tv_usec -ti.tv_usec)/1000000.0);
                     if (rand()%100 < write_file_chance) {
-                        fprintf(fptr_lat, "SET: %f\n", tf);
-                        printf("Tempo tomado para operação SET: %f\n", tf);
+                        fprintf(fptr_lat, "%f,%f,SET\n", tfs, tf);
+                        //printf("Tempo tomado para operação SET: %f\n", tf);
                     }
                 } else {
                     usleep(rand()%200);
@@ -149,15 +129,17 @@ int main (int argc, char *argv[]) {
                         freeReplyObject(reply[omp_get_thread_num()]);
                         reqs_env++;
                         gettimeofday(&t2, NULL);
+                        gettimeofday(&ts, NULL);
                     }
                     tf = (t2.tv_sec -t1.tv_sec) + ((t2.tv_usec -t1.tv_usec)/1000000.0);
+                    tfs = (ts.tv_sec -ti.tv_sec) + ((ts.tv_usec -ti.tv_usec)/1000000.0);
                     if (rand()%100 < write_file_chance) {
-                        if (reply[omp_get_thread_num()]->elements > 0) {
-                            fprintf(fptr_lat, "GET: %f\n", tf);
-                            printf("Tempo tomado para operação GET: %f\n", tf);
+                        if (reply[omp_get_thread_num()]->len > 0) {
+                            fprintf(fptr_lat, "%f,%f,GET\n", tfs, tf);
+                            //printf("Tempo tomado para operação GET: %f\n", tf);
                         } else {
-                            fprintf(fptr_lat, "GET com chave inválida: %f\n", tf);
-                            printf("Tempo tomado para operação GET com chave inválida: %f\n", tf);
+                            fprintf(fptr_lat, "%f,%f,GET,invalid\n", tfs, tf);
+                            //printf("Tempo tomado para operação GET com chave inválida: %f\n", tf);
                         }
                     }
                 }
