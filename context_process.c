@@ -1,14 +1,13 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdlib.h>
 #include <hiredis/hiredis.h>
-#include <time.h>
 #include <sys/time.h>
 #include <omp.h>
 #include <unistd.h>
 
 // antigo redistest
 // threads compartilham context
+// arquivo pronto
 
 /*
 TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reunião
@@ -51,7 +50,8 @@ int main (int argc, char *argv[]) {
     int n_reqs = strtol(argv[5], &ptr, 10);
     int reqs_env = 0, reqs_env_antigas = 0;
 
-    srand(time(NULL));
+    gettimeofday(&t1, NULL);
+    srand(t1.tv_sec);
 
     c = redisConnect("127.0.0.1", 6379);
     if (c->err) {

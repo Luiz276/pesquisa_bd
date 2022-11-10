@@ -18,7 +18,7 @@ TODO:   #-Adicionar medição de tempo mais precisa como mostrado na última reu
         #-salvar medições em um txt ou csv
         #-Latência de cada requisição salva em um txt
         -Refatorar if e else dentro do for para usar uma string e redisCommand ser genérico
-        -Fazer cada thread ter seu próprio context
+        #-Fazer cada thread ter seu próprio context
 */
 
 int main (int argc, char *argv[]) {
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
     int n_threads = strtol(argv[1], &ptr, 10);
     n_threads++;    // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
     redisReply *reply[n_threads];
-    redisContext *c;
+    //redisContext *c;
     int n_chaves = strtol(argv[2], &ptr, 10);
     int get_chance = strtol(argv[3], &ptr, 10), write_file_chance = strtol(argv[4], &ptr, 10);
     struct timeval t1, t2, ts, ti;    // ts e ti sao usados para timestamp e tempo inicial
@@ -52,16 +52,19 @@ int main (int argc, char *argv[]) {
     gettimeofday(&t1, NULL);
     srand(t1.tv_sec);
 
+/*
     c = redisConnect("127.0.0.1", 6379);
     if (c->err) {
         printf("error: %s\n", c->errstr);
         return 1;
     }
-
+*/
     /* PINGs */
+    /*
     reply[0] = redisCommand(c,"PING %s", "Hello World");
     printf("RESPONSE: %s\n", reply[0]->str);
     freeReplyObject(reply[0]);
+    */
 
     omp_set_num_threads(n_threads);
     printf("n threads = %d\n", omp_get_max_threads());
@@ -100,6 +103,13 @@ int main (int argc, char *argv[]) {
             } while (reqs_env < n_reqs);
         }
         else {
+            redisContext *c;
+            c = redisConnect("127.0.0.1", 6379);
+            if (c->err) {
+                printf("thread %d error: %s\n", omp_get_thread_num(),c->errstr);
+                //return 1;
+            }
+
             #pragma omp for firstprivate(t1,t2,reply) schedule(dynamic) nowait
             for (int i=0; i<n_reqs; i++) {
                 //gettimeofday(&t1, NULL);
@@ -147,6 +157,7 @@ int main (int argc, char *argv[]) {
                     }
                 }
             }
+            redisFree(c);
         }
         printf("Thread %d finalizada\n", omp_get_thread_num());
     }
@@ -154,6 +165,6 @@ int main (int argc, char *argv[]) {
     fclose(fptr_tp);
     fclose(fptr_lat);
 
-    redisFree(c);
+    //redisFree(c);
     return 0;
 }
