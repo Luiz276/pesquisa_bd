@@ -1,9 +1,11 @@
-CC=gcc
+#Not working properly, displays following error:
+#	makefile:2: *** faltando o separador.  Pare.
+all:
+    $(MAKE) -C source_code/redis_code
+	$(MAKE) -C source_code/socket_programing
 
-make: context_process.c context_thread.c
-	$(CC) -o context_process context_process.c -fopenmp -lhiredis
-	$(CC) -o context_thread context_thread.c -fopenmp -lhiredis
+redis:
+	$(MAKE) -C source_code/redis_code
 
-clean:
-	rm context_process
-	rm context_thread
+socket:
+	$(MAKE) -C source_code/socket_programing
