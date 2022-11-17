@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
     3° - chance de ocorrer uma requisição GET
     4° - chance de ocorrer o registro da latência da requisição em um .txt
     5° - número de requisições a serem realizadas
-    Exemplo: ./redistest 4 256 50 30 100
+    Exemplo: ./context_thread 4 256 50 30 100
     */
     if (argc == 1) {
         printf("Não se esqueça de incluir os argumentos no comando\n");
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
     int n_threads = strtol(argv[1], &ptr, 10);
     n_threads++;    // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
     redisReply *reply[n_threads];
-    //redisContext *c;
+    redisContext *c;
     int n_chaves = strtol(argv[2], &ptr, 10);
     int get_chance = strtol(argv[3], &ptr, 10), write_file_chance = strtol(argv[4], &ptr, 10);
     struct timeval t1, t2, ts, ti;    // ts e ti sao usados para timestamp e tempo inicial
@@ -52,13 +52,11 @@ int main (int argc, char *argv[]) {
     gettimeofday(&t1, NULL);
     srand(t1.tv_sec);
 
-/*
     c = redisConnect("127.0.0.1", 6379);
     if (c->err) {
         printf("error: %s\n", c->errstr);
         return 1;
     }
-*/
     /* PINGs */
     /*
     reply[0] = redisCommand(c,"PING %s", "Hello World");
@@ -66,22 +64,29 @@ int main (int argc, char *argv[]) {
     freeReplyObject(reply[0]);
     */
 
+    // limpando o banco de qualquer chave pré-existente
+    reply[0] = redisCommand(c,"FLUSHALL");
+    freeReplyObject(reply[0]);
+
+    //redisFree(c);
+
     omp_set_num_threads(n_threads);
     printf("n threads = %d\n", omp_get_max_threads());
 
-    /*
-    // Cria uma lista de chaves pré existentes
-    #pragma omp parallel for private(key)
+    //#pragma omp parallel for private(key,value)
     for (int i=0; i< n_chaves; i++) {
-        snprintf(key, 4, "%d", rand()%1000);
-        strcpy(array_chaves[i][0], key);
+        snprintf(key, n_chaves, "%d", i);
+        snprintf(value, 5, "%d", rand()%1000);
+        reply[0] = redisCommand(c,"SET %s %s",key, value);
+        freeReplyObject(reply[0]);
     }
-    */
+
+    redisFree(c);
 
     fptr_lat = fopen("./redis_lat.csv", "w");   // formato: timestamp,latencia,op,info
     fptr_tp = fopen("./redis_tp.csv", "w");     // formato: timestamp,throughput
 
-    #pragma omp parallel private(ti,ts)
+    #pragma omp parallel private(ti,ts,c)
     {
         double tf, tfs;
         gettimeofday(&ti, NULL);    // tempo inicial
@@ -103,7 +108,7 @@ int main (int argc, char *argv[]) {
             } while (reqs_env < n_reqs);
         }
         else {
-            redisContext *c;
+            //redisContext *c;
             c = redisConnect("127.0.0.1", 6379);
             if (c->err) {
                 printf("thread %d error: %s\n", omp_get_thread_num(),c->errstr);
