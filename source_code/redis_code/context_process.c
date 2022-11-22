@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
     reply[0] = redisCommand(c,"FLUSHALL");
     freeReplyObject(reply[0]);
 
-    // Cria uma lista de chaves pré existentes
+    // pré populando o banco
     //#pragma omp parallel for private(key,value)
     for (int i=0; i< n_chaves; i++) {
         snprintf(key, n_chaves, "%d", i);

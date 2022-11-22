@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <sys/time.h>
+#include <omp.h>
 /* int main() {
     char str[256] = "";
     snprintf(str, 15, "abcde\n");
@@ -10,8 +10,15 @@
 } */
 
 int main() {
-    struct timeval t1;
-    gettimeofday(&t1, NULL);
-    printf("%ld, %ld", t1.tv_sec, t1.tv_usec);
+    #pragma omp parallel num_threads(2)
+    {
+        printf("outer thread %d\n", omp_get_thread_num());
+
+        #pragma omp parallel for num_threads(10)
+        for (int i=0; i<10; i++) {
+            printf("inner thread %d\n", omp_get_thread_num());
+        }
+        printf("outer thread %d\n", omp_get_thread_num());
+    }
     return 0;
 }
