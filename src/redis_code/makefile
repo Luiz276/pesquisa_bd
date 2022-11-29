@@ -1,5 +1,6 @@
 CC=gcc
 files := context_process.c context_thread.c
+BUILD_DIR := ./executable_files
 
 make: context_process.c context_thread.c
 	$(CC) -o context_process context_process.c -fopenmp -lhiredis
