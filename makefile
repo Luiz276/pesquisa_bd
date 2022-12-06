@@ -7,7 +7,7 @@ SOURCE_DIR := ./src
 make: redis socket
 
 redis:
-	$(MAKE) -C source_code/redis_code
+	$(MAKE) -C SOURCE_DIR/redis_code
 
 socket:
-	$(MAKE) -C source_code/socket_programing
+	$(MAKE) -C SOURCE_DIR/socket_programing
