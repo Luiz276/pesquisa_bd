@@ -24,7 +24,7 @@ int main (int argc, char *argv[]) {
     /*
     Referência para parâmetros:
     1° - número de threads do programa
-    2° - número de chaves a serem usadas (ainda não implementado)
+    2° - número de chaves a serem usadas
     3° - chance de ocorrer uma requisição GET
     4° - chance de ocorrer o registro da latência da requisição em um .txt
     5° - número de requisições a serem realizadas
@@ -67,8 +67,8 @@ int main (int argc, char *argv[]) {
     freeReplyObject(reply[0]);
 
     omp_set_num_threads(n_threads+1);   // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
-    printf("n threads parallel region = %d\n", omp_get_max_threads());
-    printf("n threads variable = %d\n", n_threads);
+    //printf("n threads parallel region = %d\n", omp_get_max_threads());
+    //printf("n threads variable = %d\n", n_threads);
 
     //#pragma omp parallel for private(key,value)
     for (int i=0; i< n_chaves; i++) {
@@ -80,8 +80,8 @@ int main (int argc, char *argv[]) {
 
     redisFree(c[0]);
 
-    fptr_lat = fopen("./redis_lat.csv", "w");   // formato: timestamp,latencia,op,info
-    fptr_tp = fopen("./redis_tp.csv", "w");     // formato: timestamp,throughput
+    fptr_lat = fopen("./cont_thread_lat.csv", "w");   // formato: timestamp,latencia,op,info
+    fptr_tp = fopen("./cont_thread_tp.csv", "w");     // formato: timestamp,throughput
 
     #pragma omp parallel firstprivate(ti,ts,reply,c) shared(reqs_env, reqs_env_antigas)
     {

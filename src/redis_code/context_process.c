@@ -79,8 +79,8 @@ int main (int argc, char *argv[]) {
         freeReplyObject(reply[0]);
     }
 
-    fptr_lat = fopen("./redis_lat.csv", "w");   // formato: timestamp,latencia,op,info
-    fptr_tp = fopen("./redis_tp.csv", "w");     // formato: timestamp,throughput
+    fptr_lat = fopen("./cont_proc_lat.csv", "w");   // formato: timestamp,latencia,op,info
+    fptr_tp = fopen("./cont_proc_tp.csv", "w");     // formato: timestamp,throughput
 
     #pragma omp parallel private(ti,ts)
     {

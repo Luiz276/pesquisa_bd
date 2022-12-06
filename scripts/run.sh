@@ -9,6 +9,7 @@ cd ../src/redis_code;
 ./context_thread 4 256 50 30 100000    # 4 threads com 100 requisições
 
 #Creating corresponding directories
+mkdir -p output
 cd ../../output
 mkdir -p cont_proc
 mkdir -p cont_thread
