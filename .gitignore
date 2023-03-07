@@ -1,3 +1,4 @@
 output
 **/src/redis_code/*.csv
 .vscode
+*.tar.gz
