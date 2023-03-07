@@ -9,20 +9,23 @@ ip=$1
 port=$2
 reqs=$3
 
-#Running executable files
-./bin/context_process 4 256 50 30 $reqs $ip $port  # 4 threads com 100 requisições
-./bin/context_thread 4 256 50 30 $reqs $ip $port   # 4 threads com 100 requisições
-
 #Creating corresponding directories
 mkdir -p output
 mkdir -p output/cont_proc
 mkdir -p output/cont_thread
 
-#Moving output to respective directories
-mv cont_proc_lat.csv ./output/cont_proc
-mv cont_proc_tp.csv ./output/cont_proc
-mv cont_thread_lat.csv ./output/cont_thread
-mv cont_thread_tp.csv ./output/cont_thread
+#Running executable files
+for t in {2..4..2}; do
+    ./bin/context_process $t 256 50 30 $reqs $ip $port  # t threads com $reqs requisições
+    #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
+    mv *.csv ./output/cont_proc
+done
+
+for t in {2..4..2}; do
+    ./bin/context_thread $t 256 50 30 $reqs $ip $port  # t threads com $reqs requisições
+    #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
+    mv *.csv ./output/cont_thread
+done
 
 #Tar command on output directory
 tar cvzf output.tar.gz output

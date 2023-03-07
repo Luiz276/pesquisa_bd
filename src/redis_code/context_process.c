@@ -31,7 +31,7 @@ int main (int argc, char *argv[]) {
     5° - número de requisições a serem realizadas
     6° - Endereço de ip do servidor
     7° - Porta
-    Exemplo: ./context_thread 4 256 50 30 100 127.0.0.1 6379
+    Exemplo: ./context_process 4 256 50 30 100 127.0.0.1 6379
     */
     if (argc == 1) {
         printf("Não se esqueça de incluir os argumentos no comando\n");
@@ -72,9 +72,9 @@ int main (int argc, char *argv[]) {
     printf("n threads = %d\n", omp_get_max_threads());
 
     // limpando o banco de qualquer chave pré-existente
-    reply[0] = redisCommand(c,"FLUSHALL");
-    freeReplyObject(reply[0]);
-
+    // reply[0] = redisCommand(c,"FLUSHALL");
+    // freeReplyObject(reply[0]);
+    printf("here");
     // pré populando o banco
     //#pragma omp parallel for private(key,value)
     for (int i=0; i< n_chaves; i++) {
@@ -83,9 +83,12 @@ int main (int argc, char *argv[]) {
         reply[0] = redisCommand(c,"SET %s %s",key, value);
         freeReplyObject(reply[0]);
     }
-
-    fptr_lat = fopen("./cont_proc_lat.csv", "w");   // formato: timestamp,latencia,op,info
-    fptr_tp = fopen("./cont_proc_tp.csv", "w");     // formato: timestamp,throughput
+    printf("here");
+    char lat_name[25], tp_name[25];
+    snprintf(lat_name, 25, "./cont_proc_lat_%dt.csv", n_threads-1);
+    snprintf(tp_name, 25, "./cont_proc_tp_%dt.csv", n_threads-1);
+    fptr_lat = fopen(lat_name, "w");   // formato: timestamp,latencia,op,info
+    fptr_tp = fopen(tp_name, "w");     // formato: timestamp,throughput
 
     #pragma omp parallel private(ti,ts)
     {
