@@ -7,6 +7,6 @@ SOURCE_DIR := ./src
 REDIS := SOURCE_DIR/redis_code
 
 make:
-	cd ./src/redis_code; $(CC) -o context_process context_process.c -fopenmp -lhiredis; $(CC) -o context_thread context_thread.c -fopenmp -lhiredis
-	mv ./src/redis_code/context_process ./bin
-	mv ./src/redis_code/context_thread ./bin
+	$(CC) -o context_process ./src/redis_code/context_process.c -fopenmp -lhiredis
+	$(CC) -o context_thread ./src/redis_code/context_thread.c -fopenmp -lhiredis
+	mv context_process context_thread ./bin
