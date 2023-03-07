@@ -48,11 +48,14 @@ int main (int argc, char *argv[]) {
     FILE *fptr_lat, *fptr_tp;   // um arquivo para armazenar latência e outro para armazenar throughput
     int n_reqs = strtol(argv[5], &ptr, 10);
     int reqs_env = 0, reqs_env_antigas = 0;
+    char *ip = malloc(15);
+    ip = argv[6];
+    int porta = strtol(argv[7], &ptr, 10);
 
     gettimeofday(&t1, NULL);
     srand(t1.tv_sec);
 
-    c = redisAsyncConnect("127.0.0.1", 6379);
+    c = redisAsyncConnect(ip, porta);
     if (c->err) {
         printf("error: %s\n", c->errstr);
         return 1;

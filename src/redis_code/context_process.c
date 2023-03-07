@@ -29,7 +29,9 @@ int main (int argc, char *argv[]) {
     3° - chance de ocorrer uma requisição GET
     4° - chance de ocorrer o registro da latência da requisição em um .txt
     5° - número de requisições a serem realizadas
-    Exemplo: ./context_process 4 256 50 30 100
+    6° - Endereço de ip do servidor
+    7° - Porta
+    Exemplo: ./context_thread 4 256 50 30 100 127.0.0.1 6379
     */
     if (argc == 1) {
         printf("Não se esqueça de incluir os argumentos no comando\n");
@@ -48,11 +50,14 @@ int main (int argc, char *argv[]) {
     FILE *fptr_lat, *fptr_tp;   // um arquivo para armazenar latência e outro para armazenar throughput
     int n_reqs = strtol(argv[5], &ptr, 10);
     int reqs_env = 0, reqs_env_antigas = 0;
+    char *ip = malloc(15);
+    ip = argv[6];
+    int porta = strtol(argv[7], &ptr, 10);
 
     gettimeofday(&t1, NULL);
     srand(t1.tv_sec);
 
-    c = redisConnect("127.0.0.1", 6379);
+    c = redisConnect(ip, porta);
     if (c->err) {
         printf("error: %s\n", c->errstr);
         return 1;
