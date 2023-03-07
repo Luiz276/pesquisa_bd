@@ -1,0 +1,3 @@
+output
+**/src/redis_code/*.csv
+.vscode
