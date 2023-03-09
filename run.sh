@@ -15,16 +15,18 @@ mkdir -p output/cont_proc
 mkdir -p output/cont_thread
 
 #Running executable files
-for t in {2..4..2}; do
-    ./bin/context_process $t 256 50 30 $reqs $ip $port  # t threads com $reqs requisições
+for t in $(seq 1 4); do
+    echo $t
+    ./bin/context_process $t 256 50 30 $reqs $ip $port  # t threads com $(reqs) requisições
     #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
-    mv *.csv ./output/cont_proc
+    mv **.csv ./output/cont_proc
 done
 
-for t in {2..4..2}; do
-    ./bin/context_thread $t 256 50 30 $reqs $ip $port  # t threads com $reqs requisições
+for t in $(seq 1 4); do
+    echo $t
+    ./bin/context_thread $t 256 50 30 $reqs $ip $port  # t threads com $(reqs) requisições
     #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
-    mv *.csv ./output/cont_thread
+    mv **.csv ./output/cont_thread
 done
 
 #Tar command on output directory
