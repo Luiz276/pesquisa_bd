@@ -38,6 +38,7 @@ int main (int argc, char *argv[]) {
     }
     char *ptr;
     int n_threads = strtol(argv[1], &ptr, 10);
+    ++n_threads;    // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
     redisReply *reply[n_threads];
     redisContext *c[n_threads];
     int n_chaves = strtol(argv[2], &ptr, 10);
@@ -71,7 +72,7 @@ int main (int argc, char *argv[]) {
     reply[0] = redisCommand(c[0],"FLUSHALL");
     freeReplyObject(reply[0]);
 
-    omp_set_num_threads(n_threads+1);   // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
+    omp_set_num_threads(n_threads);   // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
     //printf("n threads parallel region = %d\n", omp_get_max_threads());
     //printf("n threads variable = %d\n", n_threads);
 
@@ -85,8 +86,11 @@ int main (int argc, char *argv[]) {
 
     redisFree(c[0]);
 
-    fptr_lat = fopen("./cont_thread_lat.csv", "w");   // formato: timestamp,latencia,op,info
-    fptr_tp = fopen("./cont_thread_tp.csv", "w");     // formato: timestamp,throughput
+    char lat_name[25], tp_name[25];
+    snprintf(lat_name, 25, "./cont_thread_lat_%dt.csv", n_threads-1);
+    snprintf(tp_name, 25, "./cont_thread_tp_%dt.csv", n_threads-1);
+    fptr_lat = fopen(lat_name, "w");   // formato: timestamp,latencia,op,info
+    fptr_tp = fopen(tp_name, "w");     // formato: timestamp,throughput
 
     #pragma omp parallel firstprivate(ti,ts,reply,c) shared(reqs_env, reqs_env_antigas)
     {
@@ -95,7 +99,7 @@ int main (int argc, char *argv[]) {
 
         if (omp_get_thread_num() == 0) {
             // código da thread de vazão
-            printf("n_reqs = %d\n", n_reqs);
+            //printf("n_reqs = %d\n", n_reqs);
             do {
                 //sleep(1);    // sleep de 1 segundo
                 //if (rand()%100 < write_file_chance) {
@@ -104,7 +108,7 @@ int main (int argc, char *argv[]) {
                     gettimeofday(&ts, NULL);
                     tfs = (ts.tv_sec -ti.tv_sec) + ((ts.tv_usec -ti.tv_usec)/1000000.0);
                     fprintf(fptr_tp, "%f,%d\n", tfs, (reqs_env - reqs_env_antigas));
-                    printf("reqs_env = %d | reqs_env_antigas = %d\n", reqs_env, reqs_env_antigas);
+                    //printf("reqs_env = %d | reqs_env_antigas = %d\n", reqs_env, reqs_env_antigas);
                 }
                 reqs_env_antigas = reqs_env;
                 sleep(1);    // sleep de 1 segundo

@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
     }
     char *ptr;
     int n_threads = strtol(argv[1], &ptr, 10);
-    n_threads++;    // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
+    ++n_threads;    // é adicionado 1 ao número de threads pois uma thread sempre será responsável por medir vazão
     redisReply *reply[n_threads];
     redisContext *c;
     int n_chaves = strtol(argv[2], &ptr, 10);
@@ -64,17 +64,17 @@ int main (int argc, char *argv[]) {
     }
 
     /* PINGs */
-    reply[0] = redisCommand(c,"PING %s", "Hello World");
-    printf("RESPONSE: %s\n", reply[0]->str);
-    freeReplyObject(reply[0]);
+    // reply[0] = redisCommand(c,"PING %s", "Hello World");
+    // printf("RESPONSE: %s\n", reply[0]->str);
+    // freeReplyObject(reply[0]);
 
     omp_set_num_threads(n_threads);
-    printf("n threads = %d\n", omp_get_max_threads());
+    //printf("n threads = %d\n", omp_get_max_threads());
 
     // limpando o banco de qualquer chave pré-existente
-    // reply[0] = redisCommand(c,"FLUSHALL");
-    // freeReplyObject(reply[0]);
-    printf("here");
+    reply[0] = redisCommand(c,"FLUSHALL");
+    freeReplyObject(reply[0]);
+
     // pré populando o banco
     //#pragma omp parallel for private(key,value)
     for (int i=0; i< n_chaves; i++) {
@@ -83,7 +83,7 @@ int main (int argc, char *argv[]) {
         reply[0] = redisCommand(c,"SET %s %s",key, value);
         freeReplyObject(reply[0]);
     }
-    printf("here");
+    
     char lat_name[25], tp_name[25];
     snprintf(lat_name, 25, "./cont_proc_lat_%dt.csv", n_threads-1);
     snprintf(tp_name, 25, "./cont_proc_tp_%dt.csv", n_threads-1);
