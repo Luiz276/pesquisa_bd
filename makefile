@@ -9,4 +9,5 @@ REDIS := SOURCE_DIR/redis_code
 make:
 	$(CC) -o context_process ./src/redis_code/context_process.c -fopenmp -lhiredis
 	$(CC) -o context_thread ./src/redis_code/context_thread.c -fopenmp -lhiredis
+	mkdir -p bin
 	mv context_process context_thread ./bin
