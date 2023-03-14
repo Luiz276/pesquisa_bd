@@ -21,7 +21,7 @@ for i in $(seq 0 20 100); do
     #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
     mv **.csv ./output/cont_proc
     
-    for t in $(seq 2 2 18); do
+    for t in $(seq 2 2 8); do
         #loop for thread number
         #echo $t
         ./bin/context_process $t 256 $i 30 $reqs $ip $port  # t threads com $(reqs) requisições
