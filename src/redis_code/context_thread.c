@@ -86,9 +86,9 @@ int main (int argc, char *argv[]) {
 
     redisFree(c[0]);
 
-    char lat_name[25], tp_name[25];
-    snprintf(lat_name, 25, "./cont_thread_lat_%dt.csv", n_threads-1);
-    snprintf(tp_name, 25, "./cont_thread_tp_%dt.csv", n_threads-1);
+    char lat_name[40], tp_name[40];
+    snprintf(lat_name, 40, "./cont_thread_lat_%dt_%dgetchance.csv", n_threads-1, get_chance);
+    snprintf(tp_name, 40, "./cont_thread_tp_%dt_%dgetchance.csv", n_threads-1, get_chance);
     fptr_lat = fopen(lat_name, "w");   // formato: timestamp,latencia,op,info
     fptr_tp = fopen(tp_name, "w");     // formato: timestamp,throughput
 
