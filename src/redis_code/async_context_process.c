@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <hiredis/hiredis.h>
 #include <hiredis/async.h>
 #include <sys/time.h>
 #include <omp.h>
