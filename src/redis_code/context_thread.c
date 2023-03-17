@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <omp.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 // Fazer cada thread ter seu próprio context
 
