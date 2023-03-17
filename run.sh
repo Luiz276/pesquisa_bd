@@ -7,7 +7,7 @@
 #Variables
 ip="${1:-"127.0.0.1"}"
 port="${2:-6379}"
-reqs="${3:-100}"
+reqs="${3:-1000}"
 
 #Creating corresponding directories
 mkdir -p output
@@ -21,7 +21,7 @@ for i in $(seq 0 20 100); do
     #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
     mv **.csv ./output/cont_proc
     
-    for t in $(seq 2 2 8); do
+    for t in $(seq 2 2 4); do
         #loop for thread number
         #echo $t
         ./bin/context_process $t 256 $i 30 $reqs $ip $port  # t threads com $(reqs) requisições
@@ -33,7 +33,7 @@ for i in $(seq 0 20 100); do
     #mv cont_proc_lat.csv cont_proc_tp.csv ./output/cont_proc
     mv **.csv ./output/cont_thread
 
-    for t in $(seq 2 2 8); do
+    for t in $(seq 2 2 4); do
         #loop for thread number
         #echo $t
         ./bin/context_thread $t 256 $i 30 $reqs $ip $port  # t threads com $(reqs) requisições
